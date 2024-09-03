@@ -481,6 +481,8 @@ cli_result_t CLI_ProcessLine (uint8_t *line)
 
    if(CliArgc > CLI_CMD_MAX_ARGS){
       Res = CLI_BAD_PARAM;
+   }else if(CliArgc == 0){
+      Res = CLI_OK;
    }else{
       const cli_command_t *Cmd = CLI_GetCommand(CliArgv[0]);
       if(Cmd != NULL){
