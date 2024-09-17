@@ -496,27 +496,25 @@ int CLI_Commands (void)
 // =============================================================================
 cli_result_t CLI_ProcessLine (uint8_t *line)
 {
-   cli_result_t Res = CLI_CMD_NOT_FOUND;
+   cli_result_t Res;
 
    CliArgc = CLI_GetArguments(line, CliArgv);
 
    if(CliArgc > CLI_CMD_MAX_ARGS){
       Res = CLI_BAD_PARAM;
-   }else if(CliArgc == 0){
-      Res = CLI_OK;
    }else{
       const cli_command_t *Cmd = CLI_GetCommand(CliArgv[0]);
       if(Cmd != NULL){
          Res = Cmd->exec(CliArgc, (char**)CliArgv);
+      }else{
+         // Distinguish invalid command and empty line
+         Res = (CliArgc) ? CLI_CMD_NOT_FOUND : CLI_OK;
       }
    }
 
    switch(Res){
       case CLI_CMD_NOT_FOUND:
-         if(CliLineLen)
-         {
             puts("command not found");
-         }
          break;
 
       case CLI_BAD_PARAM:
