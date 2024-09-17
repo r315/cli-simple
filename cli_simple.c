@@ -531,13 +531,6 @@ cli_result_t CLI_ProcessLine (uint8_t *line)
          break;
    }
 
-   // Parse splits initial line, it must be cleared in all its length
-   memset (line, '\0', CLI_LINE_MAX_LEN);
-   CliLineLen = 0;
-   CliEdit = 0;
-
-   CLI_Prompt ();
-
    return Res;
 }
 
@@ -558,7 +551,17 @@ cli_result_t CLI_HandleLine (void)
 {
    CLI_HistoryAdd(&History, CliLineBuffer);
 
-   return CLI_ProcessLine(CliLineBuffer);
+   cli_result_t Res = CLI_ProcessLine(CliLineBuffer);
+
+   // Parse splits initial line, it must be cleared in all its length
+   memset (CliLineBuffer, '\0', CLI_LINE_MAX_LEN);
+   CliLineLen = 0;
+   CliEdit = 0;
+
+
+   CLI_Prompt ();
+
+   return Res;
 }
 
 // =============================================================================
