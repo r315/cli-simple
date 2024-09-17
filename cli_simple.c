@@ -554,6 +554,9 @@ cli_result_t CLI_HandleLine (void)
    CliLineLen = 0;
    CliEdit = 0;
 
+   // Also clear parameters pointers
+   memset (CliArgv, '\0', sizeof(CliArgv));
+   CliArgc = 0;
 
    CLI_Prompt ();
 
