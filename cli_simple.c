@@ -28,6 +28,23 @@ static uint32_t (*available)(void);
 static uint32_t (*readch)(uint8_t*, uint32_t);
 
 // =============================================================================
+// CLI_GetLine
+// =============================================================================
+/*!
+ *
+ * Get internal line buffer.
+ * This can be useful to bypass ReadLine if a given character is pressed
+ *
+ * \return       - uint8_t pointer to internal line buffer
+ *
+ */
+// =============================================================================
+uint8_t *CLI_GetLine(void)
+{
+    return CliLineBuffer;
+}
+
+// =============================================================================
 // CLI_SkipSpaces
 // =============================================================================
 /*!
@@ -183,7 +200,7 @@ static void CLI_ReplaceLine(uint8_t *new_line) {
  *
  */
 // =============================================================================
-static void CLI_Prompt (void)
+void CLI_Prompt (void)
 {
    printf(
       VT100_BOLD
