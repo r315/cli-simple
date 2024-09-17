@@ -421,12 +421,6 @@ void CLI_Init (const char *prompt)
    setvbuf(stdout, NULL, _IONBF, 0); // make stdout non-buffered
 
    CLI_HistoryInit(&History);
-
-   CLI_Clear();
-
-   printf("\e[?25h\r");
-
-   CLI_Prompt ();
 }
 
 // =============================================================================
@@ -514,7 +508,7 @@ cli_result_t CLI_ProcessLine (uint8_t *line)
 
    switch(Res){
       case CLI_CMD_NOT_FOUND:
-            puts("command not found");
+         puts("command not found");
          break;
 
       case CLI_BAD_PARAM:
