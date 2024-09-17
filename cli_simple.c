@@ -91,6 +91,10 @@ static uint8_t * CLI_SkipSpaces (uint8_t *Str, uint32_t MaxLen)
 // =============================================================================
 static cli_command_t * CLI_GetCommand(uint8_t *Buffer)
 {
+   if(!Buffer){
+      return NULL;
+   }
+
    for (uint8_t i = 0; i < CliCommandsCount; i++)
    {
       if(!strcmp(CliCommands[i].name, (const char*) Buffer))
