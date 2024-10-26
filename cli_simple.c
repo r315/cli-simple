@@ -27,6 +27,7 @@ static const cli_command_t *CliCommands;
 static uint32_t (*available)(void);
 static uint32_t (*readch)(uint8_t*, uint32_t);
 
+
 // =============================================================================
 // CLI_GetLine
 // =============================================================================
@@ -61,7 +62,14 @@ uint8_t *CLI_GetLine(void)
 // =============================================================================
 static uint8_t * CLI_SkipSpaces (uint8_t *Str, uint32_t MaxLen)
 {
-   uint8_t *Start = Str;
+   uint8_t *Start;
+
+   if(!Str)
+   {
+      return NULL;
+   }
+
+   Start = Str;
 
    while (*Start == ' ' || *Start == '\t')
    {
@@ -124,7 +132,10 @@ static uint32_t CLI_GetArguments(uint8_t *Buffer, uint8_t **Argv)
 {
     uint8_t *Start, *End, ArgvIndex;
 
-    ArgvIndex = 0;
+    if(!Buffer)
+    {
+        return 0;
+    }
 
     // Skip any spaces before command
 
@@ -136,6 +147,8 @@ static uint32_t CLI_GetArguments(uint8_t *Buffer, uint8_t **Argv)
     {
         return 0;
     }
+
+    ArgvIndex = 0;
 
     Argv[ArgvIndex++] = End = Start;
 
@@ -169,12 +182,16 @@ static uint32_t CLI_GetArguments(uint8_t *Buffer, uint8_t **Argv)
  */
 // =============================================================================
 static void CLI_ReplaceLine(uint8_t *new_line) {
-	int new_line_len;
+    int new_line_len;
+
+    if(!new_line){
+        return;
+    }
 
     new_line_len = strlen((const char*)new_line);
 
     if(new_line_len > 0 && new_line_len < CLI_LINE_MAX_LEN){
-    	memcpy(CliLineBuffer, new_line, new_line_len);
+        memcpy(CliLineBuffer, new_line, new_line_len);
 
       if(CliEdit){
          printf("\e[%uC", CliEdit);
@@ -230,15 +247,19 @@ void CLI_Prompt (void)
 // =============================================================================
 static void CLI_HistoryInit(cli_history_t *Hist)
 {
-   uint16_t Index;
+    uint16_t Index;
 
-   Hist->head = 0;
-   Hist->index = 0;
-   Hist->size = 0;
+    if(!Hist){
+        return;
+    }
 
-   for(Index = 0; Index < CLI_HISTORY_SIZE; Index++){
-      memset(Hist->history[Index], '\0', CLI_LINE_MAX_LEN);
-   }
+    Hist->head = 0;
+    Hist->index = 0;
+    Hist->size = 0;
+
+    for(Index = 0; Index < CLI_HISTORY_SIZE; Index++){
+        memset(Hist->history[Index], '\0', CLI_LINE_MAX_LEN);
+    }
 }
 
 // =============================================================================
@@ -257,17 +278,20 @@ static void CLI_HistoryInit(cli_history_t *Hist)
  */
 // =============================================================================
 static void CLI_HistoryDump(cli_history_t *Hist) {
-   uint16_t Index;
+    uint16_t Index;
 
-	for (Index = 0; Index < CLI_HISTORY_SIZE; Index++)
-	{
-		printf("\n%c %u %s", (Index == Hist->head) ? '>' : ' ', Index, Hist->history[Index]);
-	}
+    if(!Hist){
+        return;
+    }
 
-	putchar('\n');
+    for (Index = 0; Index < CLI_HISTORY_SIZE; Index++)
+    {
+        printf("\n%c %u %s", (Index == Hist->head) ? '>' : ' ', Index, Hist->history[Index]);
+    }
+
+    putchar('\n');
     putchar('\n');
 }
-
 
 // =============================================================================
 // CLI_HistoryAdd
@@ -286,31 +310,35 @@ static void CLI_HistoryDump(cli_history_t *Hist) {
 // =============================================================================
 static void CLI_HistoryAdd(cli_history_t *Hist, uint8_t *line)
 {
-   uint16_t Index;
+    uint16_t Index;
 
-   if (*line != '\n' && *line != '\r' && *line != '\0') {
+    if(!Hist || !line){
+        return;
+    }
 
-      for(Index = 0; Index < CLI_LINE_MAX_LEN - 1; Index++)
-      {
-         if(line[Index] == '\0')
-         {
-            break;
-         }
+    if (*line != '\n' && *line != '\r' && *line != '\0') {
 
-         Hist->history[Hist->head][Index] = line[Index];
-      }
+        for(Index = 0; Index < CLI_LINE_MAX_LEN - 1; Index++)
+        {
+            if(line[Index] == '\0')
+            {
+                break;
+            }
 
-      Hist->history[Hist->head][Index] = '\0';
+            Hist->history[Hist->head][Index] = line[Index];
+        }
 
-      Hist->head = (Hist->head + 1) % CLI_HISTORY_SIZE;
+        Hist->history[Hist->head][Index] = '\0';
 
-	  Hist->index = Hist->head;
+        Hist->head = (Hist->head + 1) % CLI_HISTORY_SIZE;
 
-	  if (Hist->size < CLI_HISTORY_SIZE)
-      {
-         Hist->size++;
-      }
-   }
+        Hist->index = Hist->head;
+
+        if (Hist->size < CLI_HISTORY_SIZE)
+        {
+            Hist->size++;
+        }
+    }
 }
 
 // =============================================================================
@@ -330,46 +358,50 @@ static void CLI_HistoryAdd(cli_history_t *Hist, uint8_t *line)
 // =============================================================================
 static uint8_t *CLI_HistoryGet(cli_history_t *Hist, int8_t Dir)
 {
-   uint16_t CurIndex;
+    uint16_t CurIndex;
 
-   CurIndex = Hist->index;
+    if(!Hist){
+        return NULL;
+    }
 
-   if(Dir == -1)
-   {
-      if (Hist->size == CLI_HISTORY_SIZE)
-      {
-         // History is full, wrap arround is allowed
-         if (--CurIndex > CLI_HISTORY_SIZE)
-         {
-            CurIndex = CLI_HISTORY_SIZE - 1;
-         }
+    CurIndex = Hist->index;
 
-         // Stop going back if we are back on current entry
-         if (CurIndex != Hist->head)
-         {
-            Hist->index = CurIndex;
-         }
-      }
-      else if(Hist->index > 0)
-      {
-         Hist->index--;
-      }
-   }
-   else if (Dir == 1)
-   {
-      if (CurIndex != Hist->head) {
-         CurIndex = (CurIndex + 1) % CLI_HISTORY_SIZE;
-      }
+    if(Dir == -1)
+    {
+        if (Hist->size == CLI_HISTORY_SIZE)
+        {
+            // History is full, wrap arround is allowed
+            if (--CurIndex > CLI_HISTORY_SIZE)
+            {
+                CurIndex = CLI_HISTORY_SIZE - 1;
+            }
 
-      if(CurIndex == Hist->head){
-         // Clear current line to avoid duplicating history navigation
-         memset(Hist->history[CurIndex], '\0', CLI_LINE_MAX_LEN);
-      }
+            // Stop going back if we are back on current entry
+            if (CurIndex != Hist->head)
+            {
+                Hist->index = CurIndex;
+            }
+        }
+        else if(Hist->index > 0)
+        {
+            Hist->index--;
+        }
+    }
+    else if (Dir == 1)
+    {
+        if (CurIndex != Hist->head) {
+            CurIndex = (CurIndex + 1) % CLI_HISTORY_SIZE;
+        }
 
-      Hist->index = CurIndex;
-   }
+        if(CurIndex == Hist->head){
+            // Clear current line to avoid duplicating history navigation
+            memset(Hist->history[CurIndex], '\0', CLI_LINE_MAX_LEN);
+        }
 
-   return Hist->history[Hist->index];
+        Hist->index = CurIndex;
+    }
+
+    return Hist->history[Hist->index];
 }
 
 // =============================================================================
@@ -765,40 +797,42 @@ void CLI_Clear(void)
  * \return number of converted digits
  * */
 uint8_t CLI_Ia2i(char *str, int32_t *value) {
-	int val = 0;
-	char c = *str;
-	uint8_t s = 0;
+    int val = 0;
+    char c;
+    uint8_t s = 0;
 
-	if(str == NULL){
-		return 0;
-	}
+    if(str == NULL){
+        return 0;
+    }
 
     if(*str == '\0'){
         return 0;
     }
 
-	if (c == '-') {
-		s = (1 << 7); // Set signal flag
-		str++;
-		c = *str;
-	}
+    c = *str;
 
-	do{
-		if (c > '/' && c < ':') {
-			c -= '0';
-			val = val * 10 + c;
-			s++;
-		}
-		else {
-			return 0;
-		}
-		c = *(++str);
-	}while (c != ' ' && c != '\n' && c != '\r' && c != '\0');
+    if (c == '-') {
+        s = (1 << 7); // Set signal flag
+        str++;
+        c = *str;
+    }
 
-	// check signal flag
-	*value = (s & (1 << 7)) ? -val : val;
+    do{
+        if (c > '/' && c < ':') {
+            c -= '0';
+            val = val * 10 + c;
+            s++;
+        }
+        else {
+            return 0;
+        }
+        c = *(++str);
+    }while (c != ' ' && c != '\n' && c != '\r' && c != '\0');
 
-	return s & 0x7F;
+    // check signal flag
+    *value = (s & (1 << 7)) ? -val : val;
+
+    return s & 0x7F;
 }
 
 
@@ -810,37 +844,39 @@ uint8_t CLI_Ia2i(char *str, int32_t *value) {
  * \return 1 if success, 0 if failed
  * */
 uint8_t CLI_Ha2i(char *str, uint32_t *value) {
-	uint32_t val = 0;
-	char c = *str;
+    uint32_t val = 0;
+    char c;
 
-	if(str == NULL){
-		return 0;
-	}
+    if(str == NULL){
+        return 0;
+    }
 
     if(*str == '\0'){
         return 0;
     }
 
-	do {
-		val <<= 4;
-		if (c > '`' && c < 'g') {
-			c -= 'W';
-		}
-		else if ((c > '@' && c < 'G')) {
-			c -= '7';
-		}
-		else if (c > '/' && c < ':') {
-			c -= '0';
-		}
-		else {
-			return 0;
-		}
+    c = *str;
 
-		val |= c;
-		c = *(++str);
+    do {
+        val <<= 4;
+        if (c > '`' && c < 'g') {
+            c -= 'W';
+        }
+        else if ((c > '@' && c < 'G')) {
+            c -= '7';
+        }
+        else if (c > '/' && c < ':') {
+            c -= '0';
+        }
+        else {
+            return 0;
+        }
 
-	} while (c != '\0' && c != ' ' && c != '\n' && c != '\r');
+        val |= c;
+        c = *(++str);
 
-	*value = val;
-	return 1;
+    } while (c != '\0' && c != ' ' && c != '\n' && c != '\r');
+
+    *value = val;
+    return 1;
 }
