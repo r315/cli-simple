@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "syscalls.h"
+#include "stdinout.h"
 
 #define CLI_LINE_MAX_LEN    64
 #define CLI_HISTORY_SIZE    4
@@ -40,7 +40,7 @@ typedef struct cli_history_s
    uint8_t history[CLI_HISTORY_SIZE][CLI_LINE_MAX_LEN];
 }cli_history_t;
 
-void CLI_Init (const char *prompt);
+void CLI_Init (const char *prompt, stdinout_t *io);
 cli_result_t CLI_ReadLine (void);
 cli_result_t CLI_HandleLine (void);
 cli_result_t CLI_ProcessLine (uint8_t *line);

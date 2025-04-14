@@ -24,9 +24,18 @@ static cli_history_t History;
 static const char *Prompt;
 static const cli_command_t *CliCommands;
 
-static uint32_t (*available)(void);
-static uint32_t (*readch)(uint8_t*, uint32_t);
 
+static int dummy_available(void) { return 0;}
+static int dummy_read(char *buf, int len) { return 0;}
+static int dummy_write(const char *buf, int len) { return 0;}
+
+static stdinout_t default_stdinout = {
+    .available = dummy_available,
+    .read = dummy_read,
+    .write = dummy_write
+};
+
+static stdinout_t *stdinout;
 
 // =============================================================================
 // CLI_GetLine
@@ -439,14 +448,13 @@ int CLI_History(void)
  *
  */
 // =============================================================================
-void CLI_Init (const char *prompt)
+void CLI_Init (const char *prompt, stdinout_t *io)
 {
    memset (CliLineBuffer, 0x0, sizeof (CliLineBuffer));
    CliLineLen = 0;
    CliEdit = 0;
 
-   available = get_stdout_redirect()->available;
-   readch = get_stdout_redirect()->read;
+   stdinout = io ? io : &default_stdinout;
 
    Prompt = (prompt == NULL) ? "cli>" : prompt;
 
@@ -613,11 +621,11 @@ cli_result_t CLI_ReadLine (void)
 {
    static uint8_t EscSeq = 0;
 
-   if (available())
+   if (stdinout->available())
    {
       uint8_t Data;
 
-      readch(&Data, 1);
+      stdinout->read(&Data, 1);
 
       if (EscSeq == 1)
       {
