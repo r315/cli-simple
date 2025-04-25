@@ -625,7 +625,7 @@ cli_result_t CLI_ReadLine (void)
    {
       uint8_t Data;
 
-      stdinout->read(&Data, 1);
+      stdinout->read((char*)&Data, 1);
 
       if (EscSeq == 1)
       {
