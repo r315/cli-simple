@@ -47,7 +47,7 @@ cli_result_t CLI_ProcessLine (uint8_t *line);
 void CLI_RegisterCommand (const cli_command_t *Commands, uint8_t Count);
 int CLI_Commands(void);
 int CLI_History(void);
-int CLI_Run(void *);
+int CLI_Run(void (*func)(void));
 void CLI_Clear(void);
 uint8_t *CLI_GetLine(void);
 void CLI_Prompt (void);

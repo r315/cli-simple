@@ -768,25 +768,26 @@ cli_result_t CLI_ReadLine (void)
  *
  * Continuously processes cli, this is intended to be used by a thread from OS
  *
- * \param - Prt
+ * \param func - Function pointer for thread yield or other processes execution.
  *
  * \return - exit status
  *
  */
 // =============================================================================
-int CLI_Run(void *ptr)
+int CLI_Run(void (*func)(void))
 {
     CLI_Prompt ();
 
     while(1)
     {
-        do{
+        if(CLI_ReadLine() == CLI_LINE_READ){
+            if(CLI_HandleLine() == CLI_EXIT){
+                break;
+            }
+        }
 
-        }while(CLI_ReadLine() != CLI_LINE_READ);
-
-        if(CLI_HandleLine() == CLI_EXIT)
-        {
-            break;
+        if(func){
+            func();
         }
     }
 
