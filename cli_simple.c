@@ -35,7 +35,7 @@ static stdinout_t default_stdinout = {
     .write = dummy_write
 };
 
-static stdinout_t *stdinout;
+static const stdinout_t *stdinout;
 
 // =============================================================================
 // CLI_GetLine
@@ -448,7 +448,7 @@ int CLI_History(void)
  *
  */
 // =============================================================================
-void CLI_Init (const char *prompt, stdinout_t *io)
+void CLI_Init (const char *prompt, const stdinout_t *io)
 {
    memset (CliLineBuffer, 0x0, sizeof (CliLineBuffer));
    CliLineLen = 0;
