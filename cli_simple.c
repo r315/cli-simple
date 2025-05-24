@@ -776,6 +776,8 @@ cli_result_t CLI_ReadLine (void)
 // =============================================================================
 int CLI_Run(void *ptr)
 {
+    CLI_Prompt ();
+
     while(1)
     {
         do{
