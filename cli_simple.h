@@ -6,11 +6,16 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <string.h>
 #include "stdinout.h"
 
 #define CLI_LINE_MAX_LEN    64
 #define CLI_HISTORY_SIZE    4
 #define CLI_CMD_MAX_ARGS    8
+
+#define CLI_IS_PARM(_i, _P) !strcmp((const char*)argv[_i], (const char*)_P)
+#define CLI_GET_INT_PARM(_i, _P) CLI_Ia2i(argv[_i], (int32_t*)&_P)
+#define CLI_GET_HINT_PARM(_i, _P) CLI_Ha2i(argv[_i], (uint32_t*)&_P)
 
 typedef enum cli_result_e
 {
