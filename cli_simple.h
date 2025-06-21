@@ -45,14 +45,14 @@ typedef struct cli_history_s
    uint8_t history[CLI_HISTORY_SIZE][CLI_LINE_MAX_LEN];
 }cli_history_t;
 
-void CLI_Init (const char *prompt, stdinout_t *io);
+void CLI_Init (const char *prompt, const stdinout_t *io);
 cli_result_t CLI_ReadLine (void);
 cli_result_t CLI_HandleLine (void);
 cli_result_t CLI_ProcessLine (uint8_t *line);
 void CLI_RegisterCommand (const cli_command_t *Commands, uint8_t Count);
 int CLI_Commands(void);
 int CLI_History(void);
-int CLI_Run(void *);
+int CLI_Run(void (*func)(void));
 void CLI_Clear(void);
 uint8_t *CLI_GetLine(void);
 void CLI_Prompt (void);

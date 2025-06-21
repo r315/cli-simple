@@ -35,7 +35,7 @@ static stdinout_t default_stdinout = {
     .write = dummy_write
 };
 
-static stdinout_t *stdinout;
+static const stdinout_t *stdinout;
 
 // =============================================================================
 // CLI_GetLine
@@ -448,7 +448,7 @@ int CLI_History(void)
  *
  */
 // =============================================================================
-void CLI_Init (const char *prompt, stdinout_t *io)
+void CLI_Init (const char *prompt, const stdinout_t *io)
 {
    memset (CliLineBuffer, 0x0, sizeof (CliLineBuffer));
    CliLineLen = 0;
@@ -768,23 +768,26 @@ cli_result_t CLI_ReadLine (void)
  *
  * Continuously processes cli, this is intended to be used by a thread from OS
  *
- * \param - Prt
+ * \param func - Function pointer for thread yield or other processes execution.
  *
  * \return - exit status
  *
  */
 // =============================================================================
-int CLI_Run(void *ptr)
+int CLI_Run(void (*func)(void))
 {
+    CLI_Prompt ();
+
     while(1)
     {
-        do{
+        if(CLI_ReadLine() == CLI_LINE_READ){
+            if(CLI_HandleLine() == CLI_EXIT){
+                break;
+            }
+        }
 
-        }while(CLI_ReadLine() != CLI_LINE_READ);
-
-        if(CLI_HandleLine() == CLI_EXIT)
-        {
-            break;
+        if(func){
+            func();
         }
     }
 
