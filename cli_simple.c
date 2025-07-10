@@ -234,7 +234,7 @@ void CLI_Prompt (void)
 {
    printf(
       VT100_BOLD
-      "%s"
+      "%s "
       VT100_NORMAL
       ,Prompt);
 }
