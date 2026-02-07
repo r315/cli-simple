@@ -26,8 +26,8 @@ static const cli_command_t *CliCommands;
 
 
 static int dummy_available(void) { return 0;}
-static int dummy_read(char *buf, int len) { return 0;}
-static int dummy_write(const char *buf, int len) { return 0;}
+static int dummy_read(char *buf, int len) {(void)buf; (void)len; return 0;}
+static int dummy_write(const char *buf, int len) {(void)buf; (void)len; return 0;}
 
 static stdinout_t default_stdinout = {
     .available = dummy_available,
