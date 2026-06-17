@@ -50,7 +50,7 @@ cli_result_t CLI_ReadLine (void);
 cli_result_t CLI_HandleLine (void);
 cli_result_t CLI_ProcessLine (uint8_t *line);
 void CLI_RegisterCommand (const cli_command_t *Commands, uint8_t Count);
-int CLI_Commands(void);
+int CLI_PrintCommands(int argc, char **argv);
 int CLI_History(void);
 int CLI_Run(void (*func)(void));
 void CLI_Clear(void);

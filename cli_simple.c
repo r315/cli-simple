@@ -502,8 +502,11 @@ void CLI_RegisterCommand (const cli_command_t *Commands, uint8_t Count)
  *
  */
 // =============================================================================
-int CLI_Commands (void)
+int CLI_PrintCommands (int argc, char **argv)
 {
+   (void)argc;
+   (void)argv;
+
    for (int i = 0; i < CliCommandsCount; i++)
    {
       printf("\n %s", CliCommands[i].name);
