@@ -132,12 +132,13 @@ static cli_command_t * CLI_GetCommand(uint8_t *Buffer)
  *
  * \param[in] - Buffer  String containing command and arguments
  * \param[out] - Argv    Arguments output array
+ * \param[in] - size  maximum size of buffer in bytes
  *
  * \return - Number of arguments
  *
  */
 // =============================================================================
-static uint32_t CLI_GetArguments(uint8_t *Buffer, uint8_t **Argv)
+static uint32_t CLI_SplitArguments(uint8_t **Argv, uint8_t *Buffer, uint16_t size)
 {
     uint8_t *Start, *End, ArgvIndex;
 
@@ -148,7 +149,7 @@ static uint32_t CLI_GetArguments(uint8_t *Buffer, uint8_t **Argv)
 
     // Skip any spaces before command
 
-    Start = CLI_SkipSpaces (Buffer, CLI_LINE_MAX_LEN);
+    Start = CLI_SkipSpaces (Buffer, size);
 
     // Check for empty line
 
@@ -166,13 +167,17 @@ static uint32_t CLI_GetArguments(uint8_t *Buffer, uint8_t **Argv)
         {
             // Split argument
             *End = '\0';
-            End = CLI_SkipSpaces(End + 1, CLI_LINE_MAX_LEN);
-            Argv[ArgvIndex++] = End;
+            End = CLI_SkipSpaces(End + 1, size);
+            Argv[ArgvIndex] = End;
+            if(*End){
+                // there is a next argument, increment count
+                ArgvIndex++;
+            }
             continue;
         }
 
         End++;
-    }while(*End != '\0' && End != Start + CLI_LINE_MAX_LEN);
+    }while(*End != '\0' && End != Start + size);
 
     return ArgvIndex;
 }
@@ -531,11 +536,11 @@ int CLI_PrintCommands (int argc, char **argv)
  *
  */
 // =============================================================================
-cli_result_t CLI_ProcessLine (uint8_t *line)
+cli_result_t CLI_ProcessLine (uint8_t *line, uint16_t size)
 {
    cli_result_t Res;
 
-   CliArgc = CLI_GetArguments(line, CliArgv);
+   CliArgc = CLI_SplitArguments(CliArgv, line, size);
 
    if(CliArgc > CLI_CMD_MAX_ARGS){
       Res = CLI_BAD_PARAM;
@@ -590,7 +595,7 @@ cli_result_t CLI_HandleLine (void)
 {
    CLI_HistoryAdd(&History, CliLineBuffer);
 
-   cli_result_t Res = CLI_ProcessLine(CliLineBuffer);
+   cli_result_t Res = CLI_ProcessLine(CliLineBuffer, CLI_LINE_MAX_LEN);
 
    // Parse splits initial line, it must be cleared in all its length
    memset (CliLineBuffer, '\0', CLI_LINE_MAX_LEN);

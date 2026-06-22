@@ -48,7 +48,7 @@ typedef struct cli_history_s
 void CLI_Init (const char *prompt, const stdinout_t *io);
 cli_result_t CLI_ReadLine (void);
 cli_result_t CLI_HandleLine (void);
-cli_result_t CLI_ProcessLine (uint8_t *line);
+cli_result_t CLI_ProcessLine (uint8_t *line, uint16_t size);
 void CLI_RegisterCommand (const cli_command_t *Commands, uint8_t Count);
 int CLI_PrintCommands(int argc, char **argv);
 int CLI_History(void);
