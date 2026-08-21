@@ -14,6 +14,11 @@ extern "C" {
 #define CLI_CMD_MAX_ARGS    8
 
 #define CLI_IS_PARM(_i, _P) !strcmp((const char*)argv[_i], (const char*)_P)
+#define CLI_IS_PARM_1(_P)   CLI_IS_PARM(1, _P)
+#define CLI_IS_PARM_2(_P)   CLI_IS_PARM(2, _P)
+#define CLI_IS_PARM_3(_P)   CLI_IS_PARM(3, _P)
+#define CLI_IS_PARM_4(_P)   CLI_IS_PARM(4, _P)
+
 #define CLI_GET_INT_PARM(_i, _P) CLI_Ia2i(argv[_i], (int32_t*)&_P)
 #define CLI_GET_HINT_PARM(_i, _P) CLI_Ha2i(argv[_i], (uint32_t*)&_P)
 
