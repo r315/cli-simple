@@ -51,15 +51,16 @@ typedef struct cli_history_s
 }cli_history_t;
 
 void CLI_Init (const char *prompt, const stdinout_t *io);
-cli_result_t CLI_ReadLine (void);
-cli_result_t CLI_HandleLine (void);
-cli_result_t CLI_ProcessLine (uint8_t *line, uint16_t size);
+cli_result_t CLI_LineCheck (void);
+cli_result_t CLI_LineProcess (void);
+cli_result_t CLI_LineRun (uint8_t *line, uint16_t size);
+cli_result_t CLI_LinePushChar(uint8_t c);
+uint8_t *CLI_LineGet(void);
 void CLI_RegisterCommand (const cli_command_t *Commands, uint8_t Count);
 int CLI_PrintCommands(int argc, char **argv);
 int CLI_History(void);
 int CLI_Run(void (*func)(void));
 void CLI_Clear(void);
-uint8_t *CLI_GetLine(void);
 void CLI_Prompt (void);
 uint8_t CLI_Ia2i(char *str, int32_t *value);
 uint8_t CLI_Ha2i(char *str, uint32_t *value);
